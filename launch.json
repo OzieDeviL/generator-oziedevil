@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "${file}"
+    },
+    {
+      "name": "Launch yo",
+      "type": "node",
+      "program": "\\Users\\DavidLaughlin\\AppData\\Roaming\\npm\\yo",
+      "args": ["oziedevil"],
+      "stopOnEntry": false
+    }
+  ]
+}
