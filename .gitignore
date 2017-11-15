@@ -1,2 +1,4 @@
 node_modules
 coverage
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
