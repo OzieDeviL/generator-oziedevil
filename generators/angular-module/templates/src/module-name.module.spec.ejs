@@ -1,0 +1,34 @@
+"use strict";
+import testModule from '<%= props.moduleName %>.module';
+import 'angular';
+import 'angular-mocks';
+
+var <%= props.moduleName %> = testModule;
+
+describe('<%= props.moduleName %> module', function () {
+    beforeEach(function () {
+      angular.mock.module(<%= props.moduleName %>.name)
+    });
+  
+<%# /*add the dependencies from yeoman to the tests for dependencies*/ -%>
+<% var ngSrcDepsFileNames = []; var allDiDeps = []; -%>
+<% if (props.ngSrcDeps) { -%>
+<%  props.ngSrcDeps.forEach(file => { -%>
+<%#  /*the template assumes all file dependencies are \*\*\/\*.module.js files */ -%>
+<%  ngSrcDepsFileNames.push(file.substring(file.lastIndexOf('/') + 1, file.indexOf('.module'))); -%>
+<%  }); -%>
+<%  allDiDeps = props.ngNonSrcDeps.concat(ngSrcDepsFileNames); -%>
+<% } else { -%>
+<%   allDiDeps = props.ngNonSrcDeps -%>
+<% } -%>
+<%   -%>
+<% if (allDiDeps.length && allDiDeps.length > 0) { -%>
+   //make sure all the dependencies for this module have been included
+<% allDiDeps.forEach(dependency => { -%>
+    it('should have a dependency on the module <%= dependency %>', function () {
+      expect(<%= props.moduleName %>.requires.includes('<%= dependency %>')).toBe(true);
+    });
+<% '\r' %>
+<% }); -%>
+<% } -%>
+});

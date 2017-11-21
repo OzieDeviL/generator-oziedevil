@@ -1,11 +1,16 @@
 //documentation on this trick for integrating webpack and karma: http://mike-ward.net/2015/09/07/tips-on-setting-up-karma-testing-with-webpack/
-var webpackConfig = require('./webpack.config.js');
-
+//var webpackConfig = require('./webpack.config.js');
 
 // Karma configuration
 // Generated on Mon Oct 16 2017 15:23:30 GMT-0700 (Pacific Daylight Time)
 
-module.exports = function(config) {
+//these are needed for the webpack configuration below
+const path = require('path');
+const fs = require('fs');
+const srcDirs = getModuleDirs("./src");
+
+
+module.exports = function (config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -13,42 +18,51 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['<%= props.karmaFrameworks %>' /*'jasmine'*/],
-    
-
+    frameworks: [
+      'jasmine'
+    ],
 
     // list of files / patterns to load in the browser
     files: [
-        './src/**.spec.js',
+      './src/webpack-specs.index.js',
     ],
-    
+
     // list of files to exclude
-    exclude: [
-    ],
+    exclude: [],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        './src/feature.controller.spec.js' : ['webpack'],
-        //'./test/**/*.spec.js': ['webpack'],
-        //'./test/*.spec.js': ['webpack'],
-        //'./test/**/*.mock.js': ['webpack'],
-        //'./test/*.mock.js': ['webpack'],
+      //'./src/webpackEntryPoint.js': ['webpack'],
+      './src/**.js': ['webpack', 'sourcemap']
     },
 
-    webpack: webpackConfig,
+    webpack: {
+      //for reasons I don't understand, if I try to bring this in via an import of webpack.config.js, the files don't show up in Sources in Chrome dev tools
+      loader: {
+        test: /\.js$/
+        , exclude: /node_modules/
+        , loader: "babel-loader"
+      }
+      , devtool: 'eval-source-map',
+      resolve: {
+        modules: srcDirs
+      }
+    },
 
     webpackMiddleware: {
-        noInfo: true,
-        stats: {
-            chunks: false
-        }
+      noInfo: true,
+      stats: {
+        chunks: false
+      }
     },
 
     plugins: [
-        'karma-webpack',
-        'karma-jasmine',
-        'karma-chrome-launcher'
+      'karma-webpack'
+      , 'karma-jasmine'
+      , 'karma-chrome-launcher'
+      , 'karma-babel-preprocessor'
+      , 'karma-sourcemap-loader'
     ],
 
     // test results reporter to use
@@ -87,3 +101,13 @@ module.exports = function(config) {
     concurrency: Infinity
   })
 }
+
+function getModuleDirs(srcRoot) {
+  const isDirectory = root => fs.lstatSync(root).isDirectory();
+  const getDirectories = root => fs.readdirSync(root).map(name => path.join(root, name)).filter(isDirectory);
+  let directories = getDirectories(srcRoot);
+  directories.push('src');
+  directories.push('node_modules');
+  return directories;
+}
+

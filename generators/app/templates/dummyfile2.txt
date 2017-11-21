@@ -1,2 +1,0 @@
-Templated text should appear here: <%= title %>
-And here is the props object: <%= props.projectPrefix %>
